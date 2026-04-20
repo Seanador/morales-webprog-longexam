@@ -1,15 +1,21 @@
 import Button from '../../components/Button';
-import logo from '../../assets/img/nubdexchange_logo.png';
+import logo from '../../assets/img/nu_bulldogex_banner.jpg';
+import stickers from '../../assets/img/NU_stickerPack.webp';
+import hoodie from '../../assets/img/NU_bulldogsHoodie.webp';
+import athletics from '../../assets/img/NU_athletics_V1.webp';
+import football from '../../assets/img/NU_footballAdults.webp';
 
 const AboutPage = () => {
   return (
     <div className="flex w-full flex-col gap-6">
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-          <div className="rounded-3xl border-2 border-dashed border-zinc-300 bg-zinc-100 p-6">
-            <div className="flex min-h-72 items-center justify-center rounded-[1.25rem] bg-zinc-200">
-              <img src={logo} alt="BulldogEx" className="h-32 w-32 rounded-full border-2 border-zinc-900 bg-zinc-50 object-contain" />
-            </div>
+          <div className="rounded-2xl border-2 border-zinc-300 bg-zinc-100 p-6">
+            <img
+              src={logo}
+              alt="BulldogEx"
+              className="h-full w-full object-contain rounded-2xl"
+            />
           </div>
 
           <div>
@@ -17,11 +23,10 @@ const AboutPage = () => {
               About Store
             </p>
             <h1 className="max-w-xl text-3xl font-bold leading-tight text-zinc-900 sm:text-4xl">
-              A campus shop focused on useful products and simple ordering.
+              Home of the Bulldogs!
             </h1>
             <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-              BulldogEx Shop keeps the low-fidelity layout system while presenting clear
-              product categories, quick actions, and straightforward store information.
+              Bulldogs Exchange is the official online store of National University. Browse here what we have in store for you and get your campus essentials.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Button to="/" variant="primary">
@@ -38,20 +43,20 @@ const AboutPage = () => {
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
             Store Overview
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-zinc-900">Quick store blocks</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-zinc-900">BulldogEx Overview</h2>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-            <p className="text-2xl font-bold text-zinc-900">08</p>
+            <p className="text-2xl font-bold text-zinc-900">11</p>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-              Items
+              Branches
             </p>
           </div>
           <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-            <p className="text-2xl font-bold text-zinc-900">06</p>
+            <p className="text-2xl font-bold text-zinc-900">08</p>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-              Categories
+              Items
             </p>
           </div>
           <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
@@ -61,9 +66,9 @@ const AboutPage = () => {
             </p>
           </div>
           <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-            <p className="text-2xl font-bold text-zinc-900">24</p>
+            <p className="text-2xl font-bold text-zinc-900">2230+</p>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-              Orders
+              Nationalians Serviced
             </p>
           </div>
         </div>
@@ -75,27 +80,27 @@ const AboutPage = () => {
             <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
               Store Flow
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-zinc-900">Stacked shopping wireframe</h2>
+            <h2 className="mt-2 text-2xl font-semibold text-zinc-900">How To Order?</h2>
 
             <div className="mt-6 space-y-4">
               <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                <h3 className="text-lg font-semibold text-zinc-900">Curated Catalog</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-600">
-                  Products are grouped by daily need so shoppers can scan faster.
+                <h3 className="text-lg font-semibold text-zinc-900">Browse & Pick</h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-600">
+                  Browse the product catalog and pick the items you want to order.
                 </p>
               </article>
 
               <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                <h3 className="text-lg font-semibold text-zinc-900">Simple Checkout</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-600">
-                  Product pages keep price, stock, and action buttons easy to find.
+                <h3 className="text-lg font-semibold text-zinc-900">Place Your Order</h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-600">
+                  Head to the product page, confirm the price and stock, then submit your order.
                 </p>
               </article>
 
               <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                <h3 className="text-lg font-semibold text-zinc-900">Pickup Ready</h3>
-                <p className="mt-3 text-sm leading-6 text-zinc-600">
-                  Store information stays direct for students who need quick order updates.
+                <h3 className="text-lg font-semibold text-zinc-900">Pick Up</h3>
+                <p className="mt-1 text-sm leading-6 text-zinc-600">
+                  Wait for your order confirmation, then pick it up at the store.
                 </p>
               </article>
             </div>
@@ -107,16 +112,16 @@ const AboutPage = () => {
             </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               <div className="flex aspect-square items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                <img src={hoodie} className="h-100 w-150 object-fill block" />
               </div>
               <div className="flex aspect-square items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                <img src={stickers} className="h-100 w-150 object-fill block" />
               </div>
               <div className="flex aspect-square items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                <img src={football} className="h-100 w-150 object-fill block" />
               </div>
               <div className="flex aspect-square items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+               <img src={athletics} className="h-100 w-150 object-fill block" />
               </div>
             </div>
             <Button to="/products" className="mt-5">View Products</Button>

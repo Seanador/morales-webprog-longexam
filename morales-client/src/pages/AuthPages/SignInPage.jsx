@@ -1,80 +1,100 @@
 import { Link } from 'react-router-dom';
-import Button from '../../components/Button';
 
 const inputClasses =
-  'mt-2 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
-
-const actionButtonClassName = 'w-full rounded-xl py-3 text-[11px] tracking-[0.2em]';
+  'mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-blue-50 outline-none transition placeholder:text-white/30 focus:border-yellow-400 focus:bg-white/[0.09]';
 
 const SignInPage = () => {
   return (
-    <>
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">Log In</h1>
-      <p className="mt-3 text-sm leading-6 text-zinc-600">
-        Access your store account to review orders, saved items, and pickup details.
-      </p>
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-8">
+      <div className="w-full max-w-sm rounded-3xl border border-blue-900 bg-blue-900 px-8 py-10">
 
-      <form className="mt-8 space-y-5">
-        <div>
-          <label htmlFor="signin-email" className="text-sm font-medium text-zinc-700">
-            Email Address
-          </label>
-          <input
-            id="signin-email"
-            type="email"
-            placeholder="student@email.com"
-            autoComplete="email"
-            className={inputClasses}
-          />
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight text-blue-50">Log In</h1>
+        <p className="mt-1.5 text-sm text-yellow-400">Access your store account to review orders, saved items, and pickup details.</p>
 
-        <div>
-          <label htmlFor="signin-password" className="text-sm font-medium text-zinc-700">
-            Password
-          </label>
-          <input
-            id="signin-password"
-            type="password"
-            placeholder="Password"
-            autoComplete="current-password"
-            className={inputClasses}
-          />
-          <p className="mt-2 text-xs leading-5 text-zinc-500">
-            It must be a combination of minimum 8 letters, numbers, and symbols.
-          </p>
-        </div>
+        <div className="mt-8 space-y-5">
+          <div>
+            <label
+              htmlFor="signin-email"
+              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200"
+            >
+              Email Address
+            </label>
+            <input
+              id="signin-email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              className={inputClasses}
+            />
+          </div>
 
-        <div className="flex items-center justify-between gap-4 text-sm">
-          <label className="flex items-center gap-2 text-zinc-600">
-            <input type="checkbox" className="h-4 w-4 rounded border-zinc-300 accent-zinc-900" />
-            <span>Remember me</span>
-          </label>
-          <button type="button" className="font-medium text-zinc-700 transition hover:text-zinc-900">
-            Forgot Password?
+          <div>
+            <label
+              htmlFor="signin-password"
+              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200"
+            >
+              Password
+            </label>
+            <input
+              id="signin-password"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="current-password"
+              className={inputClasses}
+            />
+            <p className="mt-1.5 text-xs text-blue-300">
+              Minimum 8 characters — letters, numbers, and symbols.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="flex cursor-pointer items-center gap-2 text-xs text-blue-200">
+              <input
+                type="checkbox"
+                className="h-3.5 w-3.5 rounded border-white/20 accent-yellow-400"
+              />
+              <span>Remember me</span>
+            </label>
+            <button
+              type="button"
+              className="text-xs font-medium text-yellow-400 transition hover:text-yellow-300"
+            >
+              Forgot Password?
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-full bg-yellow-400 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-900 shadow-sm transition hover:bg-yellow-300 active:scale-[0.98]"
+          >
+            Log In
           </button>
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            {['Google', 'Apple'].map((label) => (
+              <button
+                key={label}
+                type="button"
+                className="rounded-full border border-white/10 bg-white/[0.06] py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-200 transition hover:bg-white/[0.11] hover:text-yellow-300"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <Button type="submit" variant="primary" className={actionButtonClassName}>
-          Log In
-        </Button>
-
-        <div className="grid gap-3 pt-2 sm:grid-cols-2">
-          <Button type="button" variant="secondary" className={actionButtonClassName}>
-            Log In with Google
-          </Button>
-          <Button type="button" variant="secondary" className={actionButtonClassName}>
-            Log In with Apple
-          </Button>
+        <div className="mt-8 border-t border-white/10 pt-5 text-center text-xs text-blue-300">
+          No account yet{' '}
+          <Link
+            to="/auth/signup"
+            className="font-semibold text-yellow-400 transition hover:text-yellow-300"
+          >
+            Sign Up
+          </Link>
         </div>
-      </form>
 
-      <div className="mt-8 border-t border-zinc-200 pt-6 text-sm text-zinc-600">
-        No account yet?{' '}
-        <Link to="/auth/signup" className="font-semibold text-zinc-900 transition hover:text-zinc-600">
-          Sign Up
-        </Link>
       </div>
-    </>
+    </div>
   );
 };
 

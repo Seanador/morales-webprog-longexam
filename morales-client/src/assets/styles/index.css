@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+
+@theme {
+  --font-montserrat: "Montserrat", sans-serif;
+}
+ 
 @layer base {
   body {
-    @apply bg-zinc-100 text-zinc-900 antialiased;
+    @apply bg-zinc-100 text-zinc-900 antialiased font-montserrat;
   }
 
   #root {

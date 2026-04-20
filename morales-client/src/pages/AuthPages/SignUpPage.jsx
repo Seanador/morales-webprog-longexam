@@ -1,97 +1,105 @@
 import { Link } from 'react-router-dom';
-import Button from '../../components/Button';
 
 const inputClasses =
-  'mt-2 w-full rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-3 text-sm text-zinc-900 outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:bg-zinc-50';
-
-const actionButtonClassName = 'w-full rounded-xl py-3 text-[11px] tracking-[0.2em]';
+  'mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-blue-50 outline-none transition placeholder:text-white/30 focus:border-yellow-400 focus:bg-white/[0.09]';
 
 const SignUpPage = () => {
   return (
-    <>
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">Sign Up</h1>
-      <p className="mt-3 text-sm leading-6 text-zinc-600">
-        Create a store account for faster checkout, order updates, and pickup details.
-      </p>
+    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-8">
+      <div className="w-full max-w-md rounded-3xl border border-blue-900 bg-blue-900 px-8 py-10">
 
-      <form className="mt-8 space-y-5">
-        <div className="grid gap-5 sm:grid-cols-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-blue-50">Sign Up</h1>
+        <p className="mt-1.5 text-sm text-yellow-400">
+          Create your account to get started.
+        </p>
+
+        <form className="mt-8 space-y-5">
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200">
+                First Name
+              </label>
+              <input
+                type="text"
+                placeholder="John"
+                autoComplete="given-name"
+                className={inputClasses}
+              />
+            </div>
+
+            <div>
+              <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200">
+                Last Name
+              </label>
+              <input
+                type="text"
+                placeholder="Doe"
+                autoComplete="family-name"
+                className={inputClasses}
+              />
+            </div>
+          </div>
+
           <div>
-            <label htmlFor="first-name" className="text-sm font-medium text-zinc-700">
-              First Name
+            <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200">
+              Email Address
             </label>
             <input
-              id="first-name"
-              type="text"
-              placeholder="First name"
-              autoComplete="given-name"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
               className={inputClasses}
             />
           </div>
+
           <div>
-            <label htmlFor="last-name" className="text-sm font-medium text-zinc-700">
-              Last Name
+            <label className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200">
+              Password
             </label>
             <input
-              id="last-name"
-              type="text"
-              placeholder="Last name"
-              autoComplete="family-name"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
               className={inputClasses}
             />
+            <p className="mt-1.5 text-xs text-blue-300">
+              Minimum 8 characters — letters, numbers, and symbols.
+            </p>
           </div>
+
+          <button
+            type="submit"
+            className="w-full rounded-full bg-yellow-400 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-900 shadow-sm transition hover:bg-yellow-300 active:scale-[0.98]"
+          >
+            Create Account
+          </button>
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            {['Google', 'Apple'].map((label) => (
+              <button
+                key={label}
+                type="button"
+                className="rounded-full border border-white/10 bg-white/[0.06] py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-200 transition hover:bg-white/[0.11] hover:text-yellow-300"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </form>
+
+        <div className="mt-8 border-t border-white/10 pt-5 text-center text-xs text-blue-300">
+          Already have an account?{' '}
+          <Link
+            to="/auth/signin"
+            className="font-semibold text-yellow-400 transition hover:text-yellow-300"
+          >
+            Log In
+          </Link>
         </div>
 
-        <div>
-          <label htmlFor="signup-email" className="text-sm font-medium text-zinc-700">
-            Email
-          </label>
-          <input
-            id="signup-email"
-            type="email"
-            placeholder="student@email.com"
-            autoComplete="email"
-            className={inputClasses}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="signup-password" className="text-sm font-medium text-zinc-700">
-            Password
-          </label>
-          <input
-            id="signup-password"
-            type="password"
-            placeholder="Password"
-            autoComplete="new-password"
-            className={inputClasses}
-          />
-          <p className="mt-2 text-xs leading-5 text-zinc-500">
-            Use a secure password with letters, numbers, and symbols.
-          </p>
-        </div>
-
-        <Button type="submit" variant="primary" className={actionButtonClassName}>
-          Create Account
-        </Button>
-
-        <div className="grid gap-3 pt-2 sm:grid-cols-2">
-          <Button type="button" variant="secondary" className={actionButtonClassName}>
-            Sign Up with Google
-          </Button>
-          <Button type="button" variant="secondary" className={actionButtonClassName}>
-            Sign Up with Apple
-          </Button>
-        </div>
-      </form>
-
-      <div className="mt-8 border-t border-zinc-200 pt-6 text-sm text-zinc-600">
-        Already have an account?{' '}
-        <Link to="/auth/signin" className="font-semibold text-zinc-900 transition hover:text-zinc-600">
-          Log In
-        </Link>
       </div>
-    </>
+    </div>
   );
 };
 

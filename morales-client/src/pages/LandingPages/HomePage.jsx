@@ -1,5 +1,8 @@
 import Button from '../../components/Button';
 import banner from '../../assets/img/nu_bulldogex_banner.jpg';
+import stickers from '../../assets/img/NU_stickerPack.webp';
+import hoodie from '../../assets/img/NU_bulldogsHoodie.webp';
+import champs from '../../assets/img/NU_backToBackChamps.webp';
 
 const HomePage = () => {
     return (
@@ -77,13 +80,13 @@ const HomePage = () => {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
                         Shop Sections
                     </p>
-                    <h2 className="mt-2 text-2xl font-semibold text-zinc-900">Simple store cards</h2>
+                    <h2 className="mt-2 text-2xl font-semibold text-zinc-900">Bulldog Essentials</h2>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3">
                     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                            <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                           <img src={hoodie} className="h-120 w-170 object-fill block" />
                         </div>
                         <h3 className="mt-4 text-lg font-semibold text-zinc-900">Daily Essentials</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
@@ -94,7 +97,7 @@ const HomePage = () => {
 
                     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                            <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                            <img src={stickers} className="h-120 w-145 object-fill block" />
                         </div>
                         <h3 className="mt-4 text-lg font-semibold text-zinc-900">Study Supplies</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
@@ -105,11 +108,11 @@ const HomePage = () => {
 
                     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
-                            <div className="h-12 w-12 border-2 border-zinc-300 bg-zinc-100" />
+                            <img src={champs} className="h-120 w-170 object-fill block" />
                         </div>
-                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Campus Apparel</h3>
+                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">UAAP Merchandise</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
-                            Comfortable pieces for class days, commute days, and weekends.
+                            Not for Tamaraws 😭🙏🏼
                         </p>
                         <Button to="/products" className="mt-4" variant="primary">
                             View Apparel

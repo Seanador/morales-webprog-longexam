@@ -10,10 +10,10 @@ const ProductListPage = () => {
           Products
         </p>
         <h1 className="max-w-xl text-3xl font-bold leading-tight text-zinc-900 sm:text-4xl">
-          Shop campus essentials in a simple product grid
+          Shop Bulldog Merch
         </h1>
         <p className="mt-4 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-          Browse practical items for class, study, commute, and everyday campus routines.
+          Browse National University's Official Merchandise Product Catalog
         </p>
         <div className="mt-6">
           <Button to="/">Back Home</Button>
