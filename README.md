@@ -35,7 +35,6 @@ After the repository is forked, clone your forked repository to your local devic
 ```bash
 git clone <forked-repository-url>
 ```
-
 Example:
 
 ```bash
@@ -113,82 +112,145 @@ git commit -m "enhanced long-exam1"
 git push
 ```
 
-## Current Routes
+## Server and Client Integration
 
-- `/` - Home page
-- `/about` - About page
-- `/products` - Product list page
-- `/products/:name` - Single product page
-- `/auth/signin` - Sign in page
-- `/auth/signup` - Sign up page
+This project is divided into two parts: `morales-client` for the website that users see, and `morales-server` for the API and database work. The client sends requests to the server using the browser's `fetch` function. For example, it requests products, creates an account, logs a user in, and sends cart or order information to the API.
 
-## Key Files
+The server receives these requests through Express routes, checks the request when needed, and then reads or updates the MongoDB database through Mongoose. It sends the result back as JSON, which the React pages use to update what is shown on screen. CORS is enabled on the server so the client and server can run on different local ports while developing.
 
-- `src/assets/product-content.js` - product data used by the catalog and product pages
-- `src/components/ProductCard.jsx` - reusable product card component
-- `src/components/ProductList.jsx` - product grid component
-- `src/pages/LandingPages/ProductListPage.jsx` - product catalog page
-- `src/pages/LandingPages/ProductPage.jsx` - single product detail page
-- `src/pages/LandingPages/HomePage.jsx` - landing page with full-width hero banner
+When a user signs in, the server returns a token. The client saves the token in local storage and includes it in requests that need a logged-in user, such as viewing orders or managing products. The server checks the token before allowing those actions.
 
-## Current File Structure
+## Libraries and Packages Used
+
+### Client
+
+- **React** builds the user interface using reusable components such as the navbar, footer, product card, and buttons.
+- **Vite** runs the client quickly during development and creates the final production build.
+- **React Router DOM** handles page navigation for the home page, products, authentication pages, cart, orders, and dashboard without reloading the whole site.
+- **Tailwind CSS** is used for styling the pages with ready-to-use utility classes.
+- **ESLint** checks the JavaScript and React code for common mistakes and keeps the code style more consistent.
+
+### Server
+
+- **Express** creates the API endpoints that the client calls.
+- **Mongoose** connects the server to MongoDB and defines the structure of data such as users, products, categories, carts, orders, suppliers, and reviews.
+- **dotenv** loads private values, like the MongoDB connection string and JWT secret, from the server `.env` file.
+- **bcryptjs** hashes user passwords before they are stored in the database.
+- **jsonwebtoken** creates and checks login tokens for protected actions.
+- **cors** allows the client application to communicate with the API during development.
+- **nodemon** restarts the server automatically after code changes while developing.
+
+## Design Pattern Used
+
+On the client side, the project follows a component based design. Reusable parts of the interface are kept in the `components` folder, while complete screens are placed in `pages`. The `layouts` folder keeps the shared page structure; for example, the main layout contains the common navigation and footer, while the auth layout is used for sign-in and sign-up pages. React Context is used in `AuthContext` so login information can be shared by different pages without passing it through many components. Route guards such as `RequireAdmin` and `RequireCustomer` protect pages based on the user's role.
+
+On the server side, the project follows a **route-controller-model design**. Routes decide which URL and HTTP method should be handled. Controllers contain the main action, such as getting products or creating an order. Models describe how each type of data is stored in MongoDB. Middleware is placed between the request and controller when the server needs to check a user's token or role first. This separation makes each file easier to understand and update.
+
+## Project File Outline
 
 ```text
-long-exam1/
+morales-webprog-longexam/
 ├── README.md
-└── robles-client/
-    ├── .gitignore
-    ├── eslint.config.js
-    ├── index.html
-    ├── package-lock.json
+├── morales-client/                         # React user interface
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── vite.config.js
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   └── icons.svg
+│   ├── src/
+│   │   ├── App.jsx                         
+│   │   ├── main.jsx                        # React starting point
+│   │   ├── assets/                         # Images, styles, and API helper files
+│   │   │   ├── cart-content.js
+│   │   │   ├── order-content.js
+│   │   │   ├── product-content.js
+│   │   │   ├── hero.png
+│   │   │   ├── react.svg
+│   │   │   ├── vite.svg
+│   │   │   ├── styles/
+│   │   │   │   └── index.css
+│   │   │   └── img/
+│   │   │       ├── nu_bulldogex_banner.jpg
+│   │   │       ├── nubdexchange_logo.png
+│   │   │       ├── NU_athletics_V1.webp
+│   │   │       ├── NU_backToBackChamps.webp
+│   │   │       ├── NU_baseballTee.webp
+│   │   │       ├── NU_basketballTee_V2.webp
+│   │   │       ├── NU_bulldogsHoodie.webp
+│   │   │       ├── NU_footballAdults.webp
+│   │   │       ├── NU_ladyBulldogsVolleyball.webp
+│   │   │       ├── NU_ladyBulldogsVolleyball_V1.webp
+│   │   │       ├── NU_ladyBulldogsVolleyball_V3.webp
+│   │   │       ├── NU_lanyard.webp
+│   │   │       ├── NU_retroShirt_V2.webp
+│   │   │       ├── NU_scarf_V2.webp
+│   │   │       ├── NU_stickerPack.webp
+│   │   │       ├── NU_sweatShirt.webp
+│   │   │       ├── NU_TShirt_V2.webp
+│   │   │       └── NU_waterbottle.jpg
+│   │   ├── components/                     # reusable UI and protected-route components
+│   │   │   ├── Button.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── NavBar.jsx
+│   │   │   ├── ProductCard.jsx
+│   │   │   ├── ProductList.jsx
+│   │   │   ├── RequireAdmin.jsx
+│   │   │   └── RequireCustomer.jsx
+│   │   ├── context/
+│   │   │   └── AuthContext.jsx             # shared login session and user role
+│   │   ├── layouts/                        # shared page layouts
+│   │   │   ├── AuthLayout.jsx
+│   │   │   └── Layout.jsx
+│   │   ├── pages/
+│   │   │   ├── NotFoundPage.jsx
+│   │   │   ├── AdminPages/
+│   │   │   │   └── DashboardPage.jsx
+│   │   │   ├── AuthPages/
+│   │   │   │   ├── SignInPage.jsx
+│   │   │   │   └── SignUpPage.jsx
+│   │   │   └── LandingPages/
+│   │   │       ├── AboutPage.jsx
+│   │   │       ├── CartPage.jsx
+│   │   │       ├── HomePage.jsx
+│   │   │       ├── OrdersPage.jsx
+│   │   │       ├── ProductListPage.jsx
+│   │   │       └── ProductPage.jsx
+└── morales-server/                         # Express API and MongoDB connection
     ├── package.json
-    ├── public/
-    │   ├── favicon.svg
-    │   └── icons.svg
-    ├── vite.config.js
-    └── src/
-        ├── App.jsx
-        ├── main.jsx
-        ├── assets/
-        │   ├── hero.png
-        │   ├── product-content.js
-        │   ├── react.svg
-        │   ├── vite.svg
-        │   ├── img/
-        │   │   ├── nu_bulldogex_banner.jpg
-        │   │   └── nubdexchange_logo.png
-        │   └── styles/
-        │       └── index.css
-        ├── components/
-        │   ├── Button.jsx
-        │   ├── Footer.jsx
-        │   ├── NavBar.jsx
-        │   ├── ProductCard.jsx
-        │   └── ProductList.jsx
-        ├── layouts/
-        │   ├── AuthLayout.jsx
-        │   └── Layout.jsx
-        └── pages/
-            ├── NotFoundPage.jsx
-            ├── AuthPages/
-            │   ├── SignInPage.jsx
-            │   └── SignUpPage.jsx
-            └── LandingPages/
-                ├── AboutPage.jsx
-                ├── ProductListPage.jsx
-                ├── ProductPage.jsx
-                └── HomePage.jsx
+    ├── package-lock.json
+    ├── server.js                           # server starting point
+    ├── config/                             # environment, database, and constants
+    │   ├── config.js
+    │   ├── constants.js
+    │   └── db.js
+    ├── controllers/                        # application business logic
+    │   ├── cartController.js
+    │   ├── categoryController.js
+    │   ├── orderController.js
+    │   ├── productController.js
+    │   ├── reviewController.js
+    │   ├── supplierController.js
+    │   └── userController.js
+    ├── middleware/                         # token and role authentication
+    │   └── authMiddleware.js
+    ├── models/                             # MongoDB data structures and schema
+    │   ├── cartModel.js
+    │   ├── categoryModel.js
+    │   ├── orderModel.js
+    │   ├── productModel.js
+    │   ├── reviewModel.js
+    │   ├── supplierModel.js
+    │   └── userModel.js
+    ├── routes/                             # API routes
+    │   ├── cartRoutes.js
+    │   ├── categoryRoutes.js
+    │   ├── orderRoutes.js
+    │   ├── productRoutes.js
+    │   ├── reviewRoutes.js
+    │   ├── supplierRoutes.js
+    │   └── userRoutes.js
+    
 ```
-
-## Notes
-
-- `node_modules/` and `dist/` are not included in the structure above because they are generated folders.
-- The application uses `Layout.jsx` for public pages and `AuthLayout.jsx` for authentication pages.
-- Product routes use the product `name` value from `product-content.js` as the URL slug.
-
-## Enhancement Instructions
-- Enhancement 1: Develop an original product catalog with appropriate product names, descriptions, prices, categories, and images.
-- Enhancement 2: Create a customized footer and notfoundpage that aligns with the website theme and ensure that all links function correctly.
-- Enhancement 3: Provide accessible navigation links for both Sign In and Sign Up pages.
-- Enhancement 4: Improve the overall visual design through consistent colors, typography, spacing, and imagery without changing the existing component order or page structure.
-- Enhancement 5: Research and apply a custom font to the web application using an appropriate implementation method.

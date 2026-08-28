@@ -12,11 +12,14 @@ const Button = ({
   type = 'button',
   variant = 'secondary',
   className = '',
+  onClick,
+  disabled = false,
 }) => {
   const classes = [
     'inline-flex items-center justify-center rounded-full border-2 border-blue-900 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] transition active:scale-[0.98]',
     variantClasses[variant] ?? variantClasses.secondary,
     className,
+    disabled ? 'cursor-not-allowed opacity-50' : '',
   ]
     .join(' ')
     .trim();
@@ -30,7 +33,7 @@ const Button = ({
   }
 
   return (
-    <button type={type} className={classes}>
+    <button type={type} className={classes} onClick={onClick} disabled={disabled}>
       {children}
     </button>
   );

@@ -11,6 +11,11 @@ import ProductListPage from './pages/LandingPages/ProductListPage';
 import AuthLayout from './layouts/AuthLayout';
 import SignInPage from './pages/AuthPages/SignInPage';
 import SignUpPage from './pages/AuthPages/SignUpPage';
+import DashboardPage from './pages/AdminPages/DashboardPage';
+import RequireAdmin from './components/RequireAdmin';
+import RequireCustomer from './components/RequireCustomer';
+import CartPage from './pages/LandingPages/CartPage';
+import OrdersPage from './pages/LandingPages/OrdersPage';
 
 import NotFoundPage from './pages/NotFoundPage';
 
@@ -36,6 +41,9 @@ const routes = [
         path: 'products/:name',
         element: <ProductPage />,
       },
+      { path: 'dashboard', element: <RequireAdmin><DashboardPage /></RequireAdmin> },
+      { path: 'cart', element: <RequireCustomer><CartPage /></RequireCustomer> },
+      { path: 'orders', element: <RequireCustomer><OrdersPage /></RequireCustomer> },
     ],
   },
   {

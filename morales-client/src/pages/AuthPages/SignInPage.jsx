@@ -1,99 +1,104 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 const inputClasses =
-  'mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm text-blue-50 outline-none transition placeholder:text-white/30 focus:border-yellow-400 focus:bg-white/[0.09]';
+  'mt-1.5 w-full rounded-lg border-2 border-[#0B1F44]/15 bg-white px-4 py-3 text-sm text-[#0B1F44] outline-none transition placeholder:text-[#0B1F44]/30 focus:border-[#0B1F44] focus:ring-4 focus:ring-[#0B1F44]/10';
 
 const SignInPage = () => {
+  const navigate = useNavigate();
+  const { saveSession } = useAuth();
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
+  const submit = async (event) => {
+    event.preventDefault(); setError(''); setSubmitting(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/user/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message || 'Unable to log in.');
+      saveSession(result); navigate(['admin', 'supplier'].includes(result.user.userRole) ? '/dashboard' : '/');
+    } catch (requestError) { setError(requestError.message); } finally { setSubmitting(false); }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-white px-4 py-8">
-      <div className="w-full max-w-sm rounded-3xl border border-blue-900 bg-blue-900 px-8 py-10">
+    <div className="relative">
+      {/* corner notches, ticket-stub echo */}
+      <span aria-hidden className="absolute -left-3 -top-3 hidden h-3 w-3 rounded-full bg-zinc-100 sm:block" />
+      <span aria-hidden className="absolute -right-3 -top-3 hidden h-3 w-3 rounded-full bg-zinc-100 sm:block" />
 
-        <h1 className="text-2xl font-semibold tracking-tight text-blue-50">Log In</h1>
-        <p className="mt-1.5 text-sm text-yellow-400">Access your store account to review orders, saved items, and pickup details.</p>
+      <p className="text-[11px] font-bold uppercase tracking-[0.3em] text-[#F5B700]">Account Access</p>
+      <h1 className="mt-2 text-3xl font-black tracking-tight text-[#0B1F44] sm:text-4xl">Welcome back.</h1>
+      <p className="mt-2 text-sm leading-6 text-[#0B1F44]/60">
+        Sign in to manage your orders, cart, and pickup details in one place.
+      </p>
 
-        <div className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="signin-email"
-              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200"
-            >
-              Email Address
-            </label>
-            <input
-              id="signin-email"
-              type="email"
-              placeholder="you@example.com"
-              autoComplete="email"
-              className={inputClasses}
-            />
-          </div>
+      <form onSubmit={submit} className="mt-8 space-y-5">
+        <div>
+          <label htmlFor="signin-email" className="text-xs font-bold uppercase tracking-wider text-[#0B1F44]/70">
+            Email address
+          </label>
+          <input id="signin-email" name="email" type="email" value={form.email} onChange={update} required placeholder="you@example.com" autoComplete="email" className={inputClasses} />
+        </div>
 
-          <div>
-            <label
-              htmlFor="signin-password"
-              className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-200"
-            >
-              Password
-            </label>
-            <input
-              id="signin-password"
-              type="password"
-              placeholder="••••••••"
-              autoComplete="current-password"
-              className={inputClasses}
-            />
-            <p className="mt-1.5 text-xs text-blue-300">
-              Minimum 8 characters — letters, numbers, and symbols.
-            </p>
-          </div>
+        <div>
+          <label htmlFor="signin-password" className="text-xs font-bold uppercase tracking-wider text-[#0B1F44]/70">
+            Password
+          </label>
+          <input id="signin-password" name="password" type="password" value={form.password} onChange={update} required placeholder="••••••••" autoComplete="current-password" className={inputClasses} />
+          <p className="mt-2 text-xs text-[#0B1F44]/40">Minimum 8 characters — letters, numbers, and symbols.</p>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex cursor-pointer items-center gap-2 text-xs text-blue-200">
-              <input
-                type="checkbox"
-                className="h-3.5 w-3.5 rounded border-white/20 accent-yellow-400"
-              />
-              <span>Remember me</span>
-            </label>
-            <button
-              type="button"
-              className="text-xs font-medium text-yellow-400 transition hover:text-yellow-300"
-            >
-              Forgot Password?
-            </button>
-          </div>
+        {error ? (
+          <p role="alert" aria-live="polite" className="rounded-lg border-l-4 border-red-600 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </p>
+        ) : null}
 
-          <button
-            type="submit"
-            className="w-full rounded-full bg-yellow-400 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-900 shadow-sm transition hover:bg-yellow-300 active:scale-[0.98]"
-          >
-            Log In
+        <div className="flex items-center justify-between gap-3">
+          <label className="flex cursor-pointer items-center gap-2 text-xs text-[#0B1F44]/60">
+            <input type="checkbox" className="h-4 w-4 rounded border-[#0B1F44]/30 accent-[#0B1F44] focus-visible:ring-2 focus-visible:ring-[#0B1F44]/30" />
+            <span>Remember me</span>
+          </label>
+          <button type="button" className="rounded text-xs font-bold text-[#0B1F44] transition hover:text-[#e5aa00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B1F44]/30">
+            Forgot password?
           </button>
-
-          <div className="grid grid-cols-2 gap-3 pt-1">
-            {['Google', 'Apple'].map((label) => (
-              <button
-                key={label}
-                type="button"
-                className="rounded-full border border-white/10 bg-white/[0.06] py-2.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-200 transition hover:bg-white/[0.11] hover:text-yellow-300"
-              >
-                {label}
-              </button>
-            ))}
-          </div>
         </div>
 
-        <div className="mt-8 border-t border-white/10 pt-5 text-center text-xs text-blue-300">
-          No account yet{' '}
-          <Link
-            to="/auth/signup"
-            className="font-semibold text-yellow-400 transition hover:text-yellow-300"
-          >
-            Sign Up
-          </Link>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full rounded-lg bg-[#F5B700] py-3.5 text-[11px] font-black uppercase tracking-[0.22em] text-[#0B1F44] transition hover:bg-[#e5aa00] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0B1F44]/20 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {submitting ? 'Logging in...' : 'Log In'}
+        </button>
+
+        <div className="flex items-center gap-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B1F44]/30">
+          <span className="h-px flex-1 border-t-2 border-dashed border-[#0B1F44]/15" />
+          or continue with
+          <span className="h-px flex-1 border-t-2 border-dashed border-[#0B1F44]/15" />
         </div>
 
-      </div>
+        <div className="grid grid-cols-2 gap-3">
+          {['Google', 'Apple'].map((label) => (
+            <button
+              key={label}
+              type="button"
+              className="rounded-lg border-2 border-[#0B1F44] py-2.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#0B1F44] transition hover:bg-[#0B1F44] hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0B1F44]/20"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </form>
+
+      <p className="mt-8 border-t border-[#0B1F44]/10 pt-5 text-center text-sm text-[#0B1F44]/60">
+        No account yet?{' '}
+        <Link to="/auth/signup" className="font-bold text-[#0B1F44] hover:text-[#e5aa00]">
+          Sign up
+        </Link>
+      </p>
     </div>
   );
 };

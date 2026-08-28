@@ -39,41 +39,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
-                <div className="mb-6">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-500">
-                        Store Overview
-                    </p>
-                    <h2 className="mt-2 text-2xl font-semibold text-zinc-900">Quick shopping blocks</h2>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                        <p className="text-2xl font-bold text-zinc-900">08</p>
-                        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                            Products
-                        </p>
-                    </div>
-                    <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                        <p className="text-2xl font-bold text-zinc-900">06</p>
-                        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                            Categories
-                        </p>
-                    </div>
-                    <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                        <p className="text-2xl font-bold text-zinc-900">24</p>
-                        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                            Orders
-                        </p>
-                    </div>
-                    <div className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-5">
-                        <p className="text-2xl font-bold text-zinc-900">03</p>
-                        <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
-                            Pickup Slots
-                        </p>
-                    </div>
-                </div>
-            </section>
 
             <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
                 <div className="mb-6">
@@ -88,34 +53,34 @@ const HomePage = () => {
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
                            <img src={hoodie} className="h-120 w-170 object-fill block" />
                         </div>
-                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Daily Essentials</h3>
+                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Accessories</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
                             Bags, tumblers, lanyards, and items used every school day.
                         </p>
-                        <Button to="/products" className="mt-4" variant="primary">View Products</Button>
+                        <Button to="/products?category=Accessories" className="mt-4" variant="primary">View Products</Button>
                     </article>
 
                     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
                             <img src={stickers} className="h-120 w-145 object-fill block" />
                         </div>
-                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Study Supplies</h3>
+                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Stationery</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
                             Notes, desk tools, and study kits for class and review weeks.
                         </p>
-                        <Button to="/products" className="mt-4" variant="primary">Shop Supplies</Button>
+                        <Button to="/products?category=Stationery" className="mt-4" variant="primary">Shop Supplies</Button>
                     </article>
 
                     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
                         <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200">
                             <img src={champs} className="h-120 w-170 object-fill block" />
                         </div>
-                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">UAAP Merchandise</h3>
+                        <h3 className="mt-4 text-lg font-semibold text-zinc-900">Apparel</h3>
                         <p className="mt-3 text-sm leading-6 text-zinc-600">
-                            Not for Tamaraws 😭🙏🏼
+                            Official university clothing and campus wear.
                         </p>
-                        <Button to="/products" className="mt-4" variant="primary">
-                            View Apparel
+                        <Button to="/products?category=Apparel" className="mt-4" variant="primary">
+                            View Products
                         </Button>
                     </article>
                 </div>
