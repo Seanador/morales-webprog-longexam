@@ -1,0 +1,13 @@
+# Environment configuration
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+
+# Node package manifests and lockfiles
+**/package.json
+**/package-lock.json
+
+# Server utility scripts
+morales-server/scripts/

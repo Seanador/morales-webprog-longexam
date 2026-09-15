@@ -10,16 +10,20 @@ const SignInPage = () => {
   const { saveSession } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const [deactivatedMessage, setDeactivatedMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
   const submit = async (event) => {
-    event.preventDefault(); setError(''); setSubmitting(true);
+    event.preventDefault(); setError(''); setDeactivatedMessage(''); setSubmitting(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/user/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.message || 'Unable to log in.');
       saveSession(result); navigate(['admin', 'supplier'].includes(result.user.userRole) ? '/dashboard' : '/');
-    } catch (requestError) { setError(requestError.message); } finally { setSubmitting(false); }
+    } catch (requestError) {
+      if (requestError.message.includes('deactivated')) setDeactivatedMessage(requestError.message);
+      else setError(requestError.message);
+    } finally { setSubmitting(false); }
   };
 
   return (
@@ -99,6 +103,16 @@ const SignInPage = () => {
           Sign up
         </Link>
       </p>
+
+      {deactivatedMessage ? (
+        <div role="dialog" aria-modal="true" aria-labelledby="deactivated-account-title" className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B1F44]/50 p-4">
+          <div className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+            <h2 id="deactivated-account-title" className="text-xl font-black text-[#0B1F44]">Account deactivated</h2>
+            <p className="mt-3 text-sm leading-6 text-[#0B1F44]/70">{deactivatedMessage}</p>
+            <button type="button" onClick={() => setDeactivatedMessage('')} className="mt-6 rounded-lg bg-[#F5B700] px-5 py-2.5 text-xs font-black uppercase tracking-wider text-[#0B1F44] hover:bg-[#e5aa00]">Close</button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -17,6 +17,7 @@ const serializeUser = (user) => ({
   lastName: user.lastName,
   email: user.email,
   userRole: user.userRole,
+  isActive: user.isActive,
   affiliation: user.affiliation,
 });
 
@@ -49,6 +50,9 @@ const loginUser = async (req, res) => {
     }).select("+passwordHash");
     if (!user || !(await user.comparePassword(req.body.password)))
       return res.status(HttpStatus.UNAUTHORIZED).json({ message: "Invalid email or password." });
+    if (user.isActive === false) {
+      return res.status(HttpStatus.FORBIDDEN).json({ message: "This account has been deactivated. Please contact an administrator for help." });
+    }
     res.json({
       user: serializeUser(user),
       token: createToken(user),
@@ -86,10 +90,20 @@ const updateUser = async (req, res) => {
     if (req.user.userRole !== "admin" && req.user.id !== req.params.id) {
       return res.status(HttpStatus.FORBIDDEN).json({ message: "You can only update your own account." });
     }
-    const updates = req.user.userRole === "admin"
-      ? (({ firstName, lastName, email, userRole, affiliation }) => ({ firstName, lastName, email, userRole, affiliation: affiliation || undefined }))(req.body)
-      : (({ firstName, lastName, email }) => ({ firstName, lastName, email }))(req.body);
-    if (req.user.userRole === "admin" && !Object.hasOwn(req.body, "affiliation")) delete updates.affiliation;
+    const allowedFields = req.user.userRole === "admin"
+      ? ["firstName", "lastName", "email", "userRole", "isActive", "affiliation"]
+      : ["firstName", "lastName", "email"];
+    const updates = Object.fromEntries(
+      allowedFields
+        .filter((field) => Object.hasOwn(req.body, field))
+        .map((field) => [field, req.body[field]])
+    );
+    if (req.user.userRole === "admin" && Object.hasOwn(updates, "affiliation")) {
+      updates.affiliation = updates.affiliation || null;
+    }
+    if (req.user.id === req.params.id && updates.isActive === false) {
+      return res.status(HttpStatus.BAD_REQUEST).json({ message: "You cannot deactivate your own account." });
+    }
     const existingUser = await User.findById(req.params.id);
     if (!existingUser) return res.status(HttpStatus.NOT_FOUND).json({ message: "User not found." });
     const nextRole = updates.userRole ?? existingUser.userRole;

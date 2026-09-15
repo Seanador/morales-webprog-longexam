@@ -23,6 +23,7 @@ app.use("/api/review", require("./routes/reviewRoutes"));
 app.use("/api/v1/review", require("./routes/reviewRoutes"));
 app.use("/api/user", require("./routes/userRoutes"));
 app.use("/api/v1/user", require("./routes/userRoutes"));
+app.use("/api/supplier", require("./routes/supplierRoutes"));
 app.use("/api/v1/supplier", require("./routes/supplierRoutes"));
 app.use("/api/v1/suppliers", require("./routes/supplierRoutes"));
 

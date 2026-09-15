@@ -1107,6 +1107,7 @@ const Users = ({
           'Email',
           'Role',
           'Affiliation',
+          'Account status',
         ]}
       >
         {getPageRows(users, page).map(
@@ -1227,6 +1228,32 @@ const UserRow = ({
           }
         >
           Save
+        </Button>
+      </td>
+
+      <td className="px-4 py-3">
+        <Button
+          disabled={saving}
+          onClick={() =>
+            mutate(
+              `/user/${user._id}`,
+              {
+                method: 'PUT',
+                body: JSON.stringify({
+                  isActive: user.isActive === false,
+                }),
+              },
+              `Are you sure you want to ${
+                user.isActive === false
+                  ? 'enable'
+                  : 'disable'
+              } ${user.firstName} ${user.lastName}?`
+            )
+          }
+        >
+          {user.isActive === false
+            ? 'Enable user'
+            : 'Disable user'}
         </Button>
       </td>
     </tr>

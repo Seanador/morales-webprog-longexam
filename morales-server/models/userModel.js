@@ -19,6 +19,7 @@ const userSchema = new mongoose.Schema(
       enum: ["customer", "admin", "supplier"],
       default: "customer",
     },
+    isActive: { type: Boolean, default: true },
     affiliation: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Supplier",

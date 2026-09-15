@@ -13,6 +13,7 @@ const authenticate = async (req, res, next) => {
     const payload = jwt.verify(token, SECRET_KEY);
     const user = await User.findById(payload.userId);
     if (!user) return res.status(HttpStatus.UNAUTHORIZED).json({ message: "Session is no longer valid." });
+    if (user.isActive === false) return res.status(HttpStatus.FORBIDDEN).json({ message: "This account has been deactivated. Please contact an administrator for help." });
     if (user.userRole === "supplier" && !user.affiliation) {
       return res.status(HttpStatus.FORBIDDEN).json({ message: "This supplier account has no supplier affiliation." });
     }

@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const controller = require("../controllers/cartController");
-const { authenticate } = require("../middleware/authMiddleware");
-// The user id comes from the verified session, never from the browser URL.
-router.route("/").get(authenticate, controller.getCart).put(authenticate, controller.saveCart).delete(authenticate, controller.deleteCart);
+const { authenticate, authorize } = require("../middleware/authMiddleware");
+router.route("/").get(authenticate, authorize("customer"), controller.getCart).put(authenticate, authorize("customer"), controller.saveCart).delete(authenticate, authorize("customer"), controller.deleteCart);
 module.exports = router;

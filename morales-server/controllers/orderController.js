@@ -79,8 +79,14 @@ const updateOrder = async (req, res) => {
     const existingOrder = await Order.findById(req.params.id);
     if (!existingOrder) return res.status(HttpStatus.NOT_FOUND).json({ message: "Order not found." });
     if (req.user.userRole === "supplier") {
-      const hasSupplierProduct = await Product.exists({ _id: { $in: existingOrder.orderItems.map((item) => item.productId) }, supplierId: req.user.affiliation });
-      if (!hasSupplierProduct) return res.status(HttpStatus.FORBIDDEN).json({ message: "You can only update orders containing your products." });
+      const orderProductIds = existingOrder.orderItems.map((item) => item.productId);
+      const supplierProductCount = await Product.countDocuments({
+        _id: { $in: orderProductIds },
+        supplierId: req.user.affiliation,
+      });
+      if (supplierProductCount !== orderProductIds.length) {
+        return res.status(HttpStatus.FORBIDDEN).json({ message: "You can only update orders containing exclusively your products." });
+      }
     }
     if (existingOrder.orderStatus === "cancelled" && req.body.orderStatus !== "cancelled") {
       return res.status(HttpStatus.BAD_REQUEST).json({ message: "Cancelled orders cannot be reopened." });
