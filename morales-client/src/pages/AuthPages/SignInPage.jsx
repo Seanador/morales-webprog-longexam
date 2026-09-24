@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
 const inputClasses =
@@ -12,12 +12,30 @@ const SignInPage = () => {
   const [error, setError] = useState('');
   const [deactivatedMessage, setDeactivatedMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
+
+  useEffect(() => {
+    if (retryAfterSeconds <= 0) return undefined;
+    const timer = window.setTimeout(() => {
+      setRetryAfterSeconds((seconds) => Math.max(seconds - 1, 0));
+    }, 1000);
+    return () => window.clearTimeout(timer);
+  }, [retryAfterSeconds]);
+
   const update = (event) => setForm({ ...form, [event.target.name]: event.target.value });
   const submit = async (event) => {
-    event.preventDefault(); setError(''); setDeactivatedMessage(''); setSubmitting(true);
+    event.preventDefault();
+    if (retryAfterSeconds > 0) return;
+    setError(''); setDeactivatedMessage(''); setSubmitting(true);
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/user/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) });
       const result = await response.json();
+      if (response.status === 429) {
+        const retryAfter = Number(result.retryAfterSeconds || response.headers.get('Retry-After'));
+        setRetryAfterSeconds(Number.isFinite(retryAfter) && retryAfter > 0 ? Math.ceil(retryAfter) : 60);
+        setError(result.message || 'Too many failed login attempts.');
+        return;
+      }
       if (!response.ok) throw new Error(result.message || 'Unable to log in.');
       saveSession(result); navigate(['admin', 'supplier'].includes(result.user.userRole) ? '/dashboard' : '/');
     } catch (requestError) {
@@ -54,7 +72,11 @@ const SignInPage = () => {
           <p className="mt-2 text-xs text-[#0B1F44]/40">Minimum 8 characters — letters, numbers, and symbols.</p>
         </div>
 
-        {error ? (
+        {retryAfterSeconds > 0 ? (
+          <p role="alert" aria-live="polite" className="rounded-lg border-l-4 border-amber-600 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800">
+            Too many failed login attempts. Try again in {retryAfterSeconds} second{retryAfterSeconds === 1 ? '' : 's'}.
+          </p>
+        ) : error ? (
           <p role="alert" aria-live="polite" className="rounded-lg border-l-4 border-red-600 bg-red-50 px-3 py-2 text-sm text-red-700">
             {error}
           </p>
@@ -72,10 +94,10 @@ const SignInPage = () => {
 
         <button
           type="submit"
-          disabled={submitting}
+          disabled={submitting || retryAfterSeconds > 0}
           className="w-full rounded-lg bg-[#F5B700] py-3.5 text-[11px] font-black uppercase tracking-[0.22em] text-[#0B1F44] transition hover:bg-[#e5aa00] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#0B1F44]/20 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {submitting ? 'Logging in...' : 'Log In'}
+          {submitting ? 'Logging in...' : retryAfterSeconds > 0 ? `Try again in ${retryAfterSeconds}s` : 'Log In'}
         </button>
 
         <div className="flex items-center gap-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-[#0B1F44]/30">

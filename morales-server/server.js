@@ -1,13 +1,49 @@
 const express = require("express");
 const cors = require("cors");
+const helmet = require("helmet");
 const connectDB = require("./config/db");
-const { PORT } = require("./config/config");
+const { CLIENT_ORIGIN, PORT } = require("./config/config");
 const { HttpStatus } = require("./config/constants");
+const { auditLoggerMiddleware } = require("./middleware/auditLoggerMiddleware");
+const { apiLimiter } = require("./middleware/rateLimiterMiddleware");
 
 const app = express();
-app.use(cors());
+const corsOptions = {
+  origin: CLIENT_ORIGIN,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Accept",
+    "Content-Type",
+    "Authorization",
+  ],
+};
+
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'", "data:"],
+      objectSrc: ["'none'"],
+      frameAncestors: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  },
+  frameguard: { action: "sameorigin" },
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+}));
+app.options(/.*/, cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(auditLoggerMiddleware);
+app.use("/api", apiLimiter);
 
 app.get("/", (_req, res) => res.json({ message: "BulldogEx API is running." }));
 app.use("/api/product", require("./routes/productRoutes"));
