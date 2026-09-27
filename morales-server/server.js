@@ -6,6 +6,7 @@ const { CLIENT_ORIGIN, PORT } = require("./config/config");
 const { HttpStatus } = require("./config/constants");
 const { auditLoggerMiddleware } = require("./middleware/auditLoggerMiddleware");
 const { apiLimiter } = require("./middleware/rateLimiterMiddleware");
+const { imageUploadErrorHandler } = require("./middleware/uploadImageMiddleware");
 
 const app = express();
 const corsOptions = {
@@ -63,6 +64,7 @@ app.use("/api/supplier", require("./routes/supplierRoutes"));
 app.use("/api/v1/supplier", require("./routes/supplierRoutes"));
 app.use("/api/v1/suppliers", require("./routes/supplierRoutes"));
 
+app.use(imageUploadErrorHandler);
 app.use((err, _req, res, _next) => {
   console.error(err);
   res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({ message: "Internal server error." });

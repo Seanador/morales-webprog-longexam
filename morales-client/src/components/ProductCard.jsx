@@ -4,11 +4,13 @@ const ProductCard = ({ product, index }) => {
   return (
     <article className="rounded-3xl border-2 border-zinc-900 bg-zinc-100 p-4">
       <div className="flex aspect-4/3 items-center justify-center rounded-[1.25rem] bg-zinc-200 overflow-hidden">
-        <img
-          src={product.image} // replaced placeholder with product image - ProductCard.jsx
-          alt={product.title} 
-          className="h-full w-full object-cover rounded-[1.25re m]"
-        />
+        {product.image ? (
+          <img
+            src={product.image}
+            alt={product.title}
+            className="h-full w-full rounded-[1.25rem] object-cover"
+          />
+        ) : <span className="text-sm text-zinc-500">No image available</span>}
       </div>
       <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.24em] text-zinc-500">
         {product.category} {String(index + 1).padStart(2, '0')}

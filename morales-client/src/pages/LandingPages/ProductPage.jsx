@@ -74,11 +74,13 @@ function ProductPage() {
       <section className="border-y-2 border-zinc-900 bg-zinc-50 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="mx-auto max-w-3xl">
           <div className="mb-8 overflow-hidden rounded-[1.25rem] border-2 border-zinc-900 bg-zinc-200">
-            <img
-              src={product.image}
-              alt={product.title}
-              className="h-full w-full object-contain p-4"
-            />
+            {product.image ? (
+              <img
+                src={product.image}
+                alt={product.title}
+                className="h-full w-full object-contain p-4"
+              />
+            ) : <p className="p-12 text-center text-zinc-500">No image available</p>}
           </div>
 
           <div className="prose prose-sm max-w-none space-y-4 text-zinc-700">

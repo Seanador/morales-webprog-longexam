@@ -19,6 +19,7 @@ const productSchema = new mongoose.Schema(
     },
     supplierId: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
     productImage: { type: String, trim: true, default: "" },
+    productImagePublicId: { type: String, trim: true, default: "", select: false },
     stockQuantity: { type: Number, required: true, min: 0, default: 0 },
     stockStatus: {
       type: String,

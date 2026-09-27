@@ -16,11 +16,25 @@ const handleValidationErrors = (req, res, next) => {
 
 const requireAtLeastOne = (fields) =>
   body().custom((_value, { req }) => {
-    if (!fields.some((field) => Object.hasOwn(req.body || {}, field))) {
+    if (!req.file && !fields.some((field) => Object.hasOwn(req.body || {}, field))) {
       throw new Error(`At least one of these fields is required: ${fields.join(", ")}.`);
     }
     return true;
   });
+
+const validProductImagePath = (value) => {
+  if (!value) return true;
+  if (/^https?:\/\//i.test(value)) {
+    try {
+      return ["http:", "https:"].includes(new URL(value).protocol);
+    } catch (_error) {
+      return false;
+    }
+  }
+  return /\.(?:jpe?g|png|webp)(?:[?#].*)?$/i.test(value)
+    && !value.includes("..")
+    && !/^javascript:/i.test(value);
+};
 
 const idValidation = [
   param("id").isMongoId().withMessage("id must be a valid MongoDB ID."),
@@ -86,7 +100,7 @@ const createProductValidation = [
   body("productPrice").isFloat({ min: 0 }).withMessage("productPrice must be zero or greater."),
   body("categoryId").isMongoId().withMessage("categoryId must be a valid MongoDB ID."),
   body("supplierId").optional({ nullable: true }).isMongoId().withMessage("supplierId must be a valid MongoDB ID."),
-  body("productImage").optional().isString().withMessage("productImage must be a string."),
+  body("productImage").optional().isString().withMessage("productImage must be a string.").custom(validProductImagePath).withMessage("productImage must be an HTTP(S) URL or a local JPEG, PNG, or WebP path."),
   body("stockQuantity").isInt({ min: 0 }).withMessage("stockQuantity must be a non-negative integer."),
   body("stockStatus").optional().isIn(STOCK_STATUSES).withMessage(`stockStatus must be one of: ${STOCK_STATUSES.join(", ")}.`),
   body("isActive").optional().isBoolean().withMessage("isActive must be a boolean."),
@@ -100,7 +114,7 @@ const updateProductValidation = [
   body("productPrice").optional().isFloat({ min: 0 }).withMessage("productPrice must be zero or greater."),
   body("categoryId").optional().isMongoId().withMessage("categoryId must be a valid MongoDB ID."),
   body("supplierId").optional({ nullable: true }).isMongoId().withMessage("supplierId must be a valid MongoDB ID."),
-  body("productImage").optional().isString().withMessage("productImage must be a string."),
+  body("productImage").optional().isString().withMessage("productImage must be a string.").custom(validProductImagePath).withMessage("productImage must be an HTTP(S) URL or a local JPEG, PNG, or WebP path."),
   body("stockQuantity").optional().isInt({ min: 0 }).withMessage("stockQuantity must be a non-negative integer."),
   body("stockStatus").optional().isIn(STOCK_STATUSES).withMessage(`stockStatus must be one of: ${STOCK_STATUSES.join(", ")}.`),
   body("isActive").optional().isBoolean().withMessage("isActive must be a boolean."),

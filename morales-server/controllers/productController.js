@@ -3,11 +3,93 @@ const mongoose = require("mongoose");
 const Category = require("../models/categoryModel");
 const Supplier = require("../models/supplierModel");
 const { HttpStatus } = require("../config/constants");
+const cloudinary = require("../config/cloudinary");
 
 const response = (success, message, count, data) => ({ success, message, count, data });
 const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const supplierFilter = (req) => req.user.userRole === "supplier" ? { supplierId: req.user.affiliation } : {};
 const canManageProduct = (req, product) => req.user.userRole === "admin" || product.supplierId?.toString() === req.user.affiliation;
+const editableProductFields = [
+  "productName",
+  "productSlug",
+  "productDescription",
+  "productPrice",
+  "categoryId",
+  "supplierId",
+  "productImage",
+  "stockQuantity",
+  "stockStatus",
+  "isActive",
+];
+
+const pickProductFields = (body) => Object.fromEntries(
+  editableProductFields
+    .filter((field) => Object.hasOwn(body || {}, field))
+    .map((field) => [field, body[field]]),
+);
+
+const uploadImage = (file) => new Promise((resolve, reject) => {
+  const uploadStream = cloudinary.uploader.upload_stream(
+    { folder: "bulldogs-exchange/products", resource_type: "image" },
+    (error, result) => error ? reject(error) : resolve(result),
+  );
+  uploadStream.end(file.buffer);
+});
+
+const destroyCloudinaryImage = async (publicId) => {
+  if (!publicId) return;
+  try {
+    await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+  } catch (error) {
+    console.error(`Unable to remove Cloudinary image ${publicId}: ${error.message}`);
+  }
+};
+
+const uploadProductImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(HttpStatus.BAD_REQUEST).json({
+        success: false,
+        message: "An image file is required.",
+      });
+    }
+
+    const product = await Product.findById(req.params.id).select("+productImagePublicId");
+    if (!product) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        success: false,
+        message: "Product not found.",
+      });
+    }
+
+    const previousPublicId = product.productImagePublicId;
+    const result = await uploadImage(req.file);
+
+    try {
+      product.productImage = result.secure_url;
+      product.productImagePublicId = result.public_id;
+      await product.save();
+    } catch (error) {
+      await destroyCloudinaryImage(result.public_id);
+      throw error;
+    }
+
+    await destroyCloudinaryImage(previousPublicId);
+
+    res.status(HttpStatus.OK).json({
+      success: true,
+      message: "Product image uploaded successfully.",
+      imageUrl: result.secure_url,
+      publicId: result.public_id,
+      productId: product._id,
+    });
+  } catch (error) {
+    res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
 const getProducts = async (req, res) => {
   try {
@@ -103,6 +185,7 @@ const getProduct = async (req, res) => {
   }
 };
 const createProduct = async (req, res) => {
+  let uploadedImage;
   try {
     if (!req.body || Object.keys(req.body).length === 0) {
       return res.status(HttpStatus.BAD_REQUEST).json({
@@ -110,50 +193,68 @@ const createProduct = async (req, res) => {
       });
     }
 
-    const productData = req.user.userRole === "supplier"
-      ? { ...req.body, supplierId: req.user.affiliation }
-      : req.body;
+    const productData = pickProductFields(req.body);
+    if (req.user.userRole === "supplier") productData.supplierId = req.user.affiliation;
+    if (req.file) {
+      uploadedImage = await uploadImage(req.file);
+      productData.productImage = uploadedImage.secure_url;
+      productData.productImagePublicId = uploadedImage.public_id;
+    }
     res.status(HttpStatus.CREATED).json(response(true, "Product created successfully.", 1, await Product.create(productData)));
   } catch (error) {
+    if (uploadedImage?.public_id) await destroyCloudinaryImage(uploadedImage.public_id);
     res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
   }
 };
 const updateProduct = async (req, res) => {
+  let uploadedImage;
   try {
-    const existingProduct = await Product.findById(req.params.id);
+    const existingProduct = await Product.findById(req.params.id).select("+productImagePublicId");
     if (!existingProduct)
       return res.status(HttpStatus.NOT_FOUND).json({ message: "Product not found." });
     if (!canManageProduct(req, existingProduct)) {
       return res.status(HttpStatus.FORBIDDEN).json({ message: "You can only edit products affiliated with your supplier." });
     }
-    const updates = req.user.userRole === "supplier"
-      ? (({ productName, productSlug, productDescription, productPrice, categoryId, productImage, stockQuantity, stockStatus, isActive }) => ({ productName, productSlug, productDescription, productPrice, categoryId, productImage, stockQuantity, stockStatus, isActive }))(req.body)
-      : req.body;
-    const product = await Product.findByIdAndUpdate(req.params.id, updates, {
-      new: true,
-      runValidators: true,
-    });
-    if (!product)
-      return res.status(HttpStatus.NOT_FOUND).json({ message: "Product not found." });
+    const previousPublicId = existingProduct.productImagePublicId;
+    const updates = pickProductFields(req.body);
+    if (req.user.userRole === "supplier") delete updates.supplierId;
+
+    if (req.file) {
+      uploadedImage = await uploadImage(req.file);
+      updates.productImage = uploadedImage.secure_url;
+      updates.productImagePublicId = uploadedImage.public_id;
+    } else if (Object.hasOwn(updates, "productImage") && updates.productImage !== existingProduct.productImage) {
+      updates.productImagePublicId = "";
+    }
+
+    Object.assign(existingProduct, updates);
+    const product = await existingProduct.save();
+
+    if (previousPublicId && previousPublicId !== product.productImagePublicId) {
+      await destroyCloudinaryImage(previousPublicId);
+    }
     res.json(response(true, "Product updated successfully.", 1, product));
   } catch (error) {
+    if (uploadedImage?.public_id) await destroyCloudinaryImage(uploadedImage.public_id);
     res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
   }
 };
 const deleteProduct = async (req, res) => {
   try {
-    const existingProduct = await Product.findById(req.params.id);
+    const existingProduct = await Product.findById(req.params.id).select("+productImagePublicId");
     if (!existingProduct) return res.status(HttpStatus.NOT_FOUND).json({ message: "Product not found." });
     if (!canManageProduct(req, existingProduct)) return res.status(HttpStatus.FORBIDDEN).json({ message: "You can only delete products affiliated with your supplier." });
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product)
       return res.status(HttpStatus.NOT_FOUND).json({ message: "Product not found." });
+    await destroyCloudinaryImage(existingProduct.productImagePublicId);
     res.json(response(true, "Product deleted successfully.", 1, product));
   } catch (error) {
     res.status(HttpStatus.BAD_REQUEST).json({ message: error.message });
   }
 };
 module.exports = {
+  uploadProductImage,
   getProducts,
   getAdminProducts,
   getProduct,

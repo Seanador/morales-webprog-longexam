@@ -1,16 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
+import { resolveProductImage } from '../../assets/product-content';
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
   'http://localhost:5000/api/v1';
 
 const api = async (path, token, options = {}) => {
+  const isFormData = options.body instanceof FormData;
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
-      ...(options.body
+      ...(options.body && !isFormData
         ? { 'Content-Type': 'application/json' }
         : {}),
     },
@@ -44,6 +46,8 @@ const blankProduct = {
   categoryId: '',
   supplierId: '',
   productImage: '',
+  imageFile: null,
+  imagePreview: '',
   stockQuantity: 0,
   stockStatus: 'In stock',
   isActive: true,
@@ -231,6 +235,7 @@ const DashboardPage = () => {
     }
 
     setSaving(true);
+    setError('');
 
     try {
       await api(path, token, options);
@@ -264,6 +269,24 @@ const DashboardPage = () => {
     delete body.createdAt;
     delete body.updatedAt;
     delete body.__v;
+    delete body.productImagePublicId;
+    delete body.imageFile;
+    delete body.imagePreview;
+
+    let requestBody = JSON.stringify(body);
+    if (draft.imageFile) {
+      requestBody = new FormData();
+      Object.entries(body).forEach(([key, value]) => {
+        if (
+          value !== undefined &&
+          value !== null &&
+          !(key === 'supplierId' && value === '')
+        ) {
+          requestBody.append(key, String(value));
+        }
+      });
+      requestBody.append('image', draft.imageFile);
+    }
 
     mutate(
       draft._id
@@ -271,7 +294,7 @@ const DashboardPage = () => {
         : '/products',
       {
         method: draft._id ? 'PUT' : 'POST',
-        body: JSON.stringify(body),
+        body: requestBody,
       },
       `Are you sure you want to ${
         draft._id
@@ -520,6 +543,7 @@ const Products = ({
 
       <Table
         headers={[
+          'Image',
           'Product',
           'Supplier',
           'Stock',
@@ -533,6 +557,18 @@ const Products = ({
               key={item._id}
               className="border-t border-zinc-200"
             >
+              <td className="px-4 py-3">
+                <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-zinc-300 bg-zinc-100 text-center text-[10px] text-zinc-500">
+                  {item.productImage ? (
+                    <img
+                      src={resolveProductImage(item.productImage)}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  ) : 'No image'}
+                </div>
+              </td>
+
               <td className="px-4 py-3 font-medium">
                 {item.productName}
               </td>
@@ -601,11 +637,52 @@ const ProductForm = ({
   suppliers,
   isSupplier,
 }) => {
+  const [imageError, setImageError] = useState('');
   const update = (field, next) =>
     setValue({
       ...value,
       [field]: next,
     });
+
+  const clearSelectedImage = () => {
+    setValue({ ...value, imageFile: null, imagePreview: '' });
+  };
+
+  const selectImage = (event) => {
+    const file = event.target.files?.[0];
+    setImageError('');
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      clearSelectedImage();
+      event.target.value = '';
+      setImageError('Choose a JPEG, PNG, or WebP image.');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      clearSelectedImage();
+      event.target.value = '';
+      setImageError('The image must be 5 MB or smaller.');
+      return;
+    }
+
+    setValue({
+      ...value,
+      imageFile: file,
+      imagePreview: '',
+    });
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setValue((current) => current?.imageFile === file
+        ? { ...current, imagePreview: reader.result }
+        : current);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const previewImage = value.imagePreview || resolveProductImage(value.productImage);
 
   return (
     <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -698,6 +775,41 @@ const ProductForm = ({
           update('productImage', v)
         }
       />
+
+      <div className="sm:col-span-2 rounded-xl border-2 border-dashed border-zinc-400 bg-white p-4">
+        <label htmlFor="product-image" className="block text-sm font-semibold text-zinc-900">
+          Upload product image
+        </label>
+        <p className="mt-1 text-xs text-zinc-600">
+          Optional. JPEG, PNG, or WebP only, up to 5 MB. A selected file replaces the path above.
+        </p>
+        <input
+          id="product-image"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={selectImage}
+          className="mt-3 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-900 file:px-4 file:py-2 file:font-semibold file:text-yellow-400"
+        />
+        {imageError ? (
+          <p role="alert" className="mt-2 text-sm font-medium text-red-700">{imageError}</p>
+        ) : null}
+        {previewImage ? (
+          <figure className="mt-4">
+            <div className="flex h-52 items-center justify-center overflow-hidden rounded-xl border-2 border-zinc-900 bg-zinc-100">
+              <img
+                src={previewImage}
+                alt="Product image preview"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <figcaption className="mt-2 text-xs text-zinc-600">
+              {value.imageFile ? `Selected: ${value.imageFile.name}` : 'Current image preview'}
+            </figcaption>
+          </figure>
+        ) : (
+          <p className="mt-4 text-sm text-zinc-500">No product image selected.</p>
+        )}
+      </div>
 
       <label className="sm:col-span-2 text-sm font-medium">
         Description
